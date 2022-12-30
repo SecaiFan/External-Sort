@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>Array</h1>
+    <button type="submit" id="show">Показать</button>
+    <button type="submit" id="sort">Отсортировать</button>
+</body>
+<script>
+    async function get(i) {
+        const data = await fetch('http://localhost:5005/get', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json;charset=utf-8'},
+            body: JSON.stringify({index: i})
+        });
+        const formatData = await data.json();
+        return formatData.val;
+    }
+    async function put(i, val) {
+        return await fetch('http://localhost:5005/put', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json;charset=utf-8'},
+            body: JSON.stringify({index: i, val: val})
+        });
+    }
+    async function bubble_sort() {
+        const data = await fetch('http://localhost:5005/length', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json;charset=utf-8'},
+        });
+        const formatData = await data.json();
+        const length = formatData.length;
+        for(let i = 0; i < length; i++) {
+            let leftElem = await get(0);
+            for(let j = 0; j < length - i - 1; j++) {
+                let rightElem = await get(j+1);
+                if(rightElem < leftElem) {
+                    await put(j, rightElem);
+                    await put(j+1, leftElem);
+                } else leftElem = rightElem;
+            }
+        }
+        return 0;
+    }
+    document.getElementById('sort').addEventListener('click', async () => {
+            await bubble_sort();
+    });
+    document.getElementById('show').addEventListener('click', async () => {
+        const data = await fetch('http://localhost:5005/show', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json;charset=utf-8'},
+        });
+        const formatData = await data.json();
+        console.log(formatData);
+    });
+</script>
+</html>
